@@ -1,0 +1,140 @@
+import speech_recognition as sr
+import pyttsx3
+import PyPDF2
+import datetime
+import wikipedia
+import pyjokes
+import pywhatkit
+import webbrowser
+import os
+from googletrans import Translator
+listener = sr.Recognizer()
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
+
+#talking engine
+def talk(text):
+    engine.say(text)
+    engine.runAndWait()
+
+def what_messs():
+    talk("to whom you want to send messgae")
+    name = take_command()
+    talk("give the phone no.")
+    phone = take_command()
+    talk("what is message")
+    msg = take_command()
+    talk("set the timming in hour")
+    hour = take_command()
+    talk("set time in minute")
+    min = take_command()
+    talk("okk i will send msg to " + name )
+    talk("please wait")
+    pywhatkit.sendwhatmsg(+phone , msg, hour, min)
+#commaandd work
+def take_command():
+    try:
+        with sr.Microphone() as source:
+            talk("how i can help you")
+            print('listening...')
+            voice = listener.listen(source)
+            global command
+            command = listener.recognize_google(voice)
+            command = command.lower()
+            if 'assistant' in command:
+                command = command.replace('assistant', '')
+                print(command)
+            if 'one' or "two" or "three" or "four" or "nine" in command:
+                command = (int(command))
+                print(command)
+
+
+    except:
+        pass
+    return command
+
+def pdf_story():
+    talk("please tell me name of pdf")
+    nameofpdf = take_command()
+
+    talk("please wait opening pdf file")
+
+    book = open(nameofpdf +".pdf", "rb")
+    pdfReader = PyPDF2.PdfFileReader(book)
+    talk(" no. of pages in pdf ")
+    pages = pdfReader.numPages
+    print(pages)
+
+    page = pdfReader.getPage(5)
+    info = page.extractText()
+    speaker = pyttsx3.init()
+    speaker.say(info)
+    print(info)
+    speaker.runAndWait()
+#tistrt
+
+#finih
+
+def run_alexa():
+    #my all commandds here
+    command = take_command()
+    print(command)
+    if 'play' in command:
+        song = command.replace('play', '')
+        talk('playing ' + song)
+        pywhatkit.playonyt(song)
+    elif 'time' in command:
+        time = datetime.datetime.now().strftime('%I:%M %p')
+        print(time)
+        talk('Current time is ' + time)
+
+    elif 'who the heck is' in command:
+        person = command.replace('who the heck is', '')
+        info = wikipedia.summary(person, 1)
+        print(info)
+        talk(info)
+    elif "open google" in command:
+        strURL = "https://www.google.com/"
+        webbrowser.open(strURL, new=2)
+    elif "open firefox" in command:
+        ftrURL = "https://www.mozilla.org/en-US/firefox/new/"
+        webbrowser.open(ftrURL, new=2)
+    elif "open safari" in command:
+        strURL = "https://www.apple.com/in/safari/"
+        webbrowser.open(strURL, new=2)
+    elif "open powerpoint" in command:
+        talk("opening powerpoint please wait")
+        os.system("powerpnt")
+    elif "open microsoft word" in command:
+        talk("opening microsoft  please wait")
+        os.system("winword")
+    elif "open excel" in command:
+        talk(" opening excel  please wait")
+        os.system("excel")
+    elif "open notepad" in command:
+        talk(" opening notepadd  please wait")
+        os.system("Notepad")
+    elif "open telegram" in command:
+        talk("opening telegram  please wait")
+        os.system("telegram")
+    elif "open cmd" in command:
+        talk("opening cmd  please wait")
+        os.system('cmd /k "color a"')
+
+    elif 'date with me' in command:
+        talk('sorry, I have a headache')
+
+    elif 'are you single' in command:
+        talk('I am in a relationship with wifi')
+    elif 'joke' in command:
+        talk(pyjokes.get_joke())
+    elif "send message" in command:
+        what_messs()
+    elif "open pdf file" in command:
+        pdf_story()
+    else:
+        talk('Please say the command again.')
+
+while True:
+    run_alexa()
